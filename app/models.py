@@ -26,11 +26,25 @@ class User(db.Model):
 	def get_id(self):
 		return unicode(self.id)
 
+	def avatar(self, size):
+		return 'http://www.gravatar.com/avatar/' + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
+
+	@staticmethod
+	def make_unique_nickname(nickname):
+		if User.query.filter_by(nickname = nickname).first() == None:
+			return nickname
+		version = 2
+		while True:
+			new_nickname = nickname + str(version)
+			if User.query.filter_by(nickname = new_nickname).first() == None:
+				break
+			version += 1
+		return new_nickname
+
 	def __repr__(self):
 		return '<User %r>' % {self.nickname}
 
-	def avatar(self, size):
-		return 'http://www.gravatar.com/avatar/' + md5(self.email).hexdigest() + '?d=mm&s=' + str(size)
+
 
 class Post(db.Model):
 	id = db.Column(db.Integer, primary_key = True)
